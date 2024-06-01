@@ -68,8 +68,8 @@ def classify_pose(landmarks):
         left_shoulder = get_keypoint(landmarks, mp_pose.PoseLandmark.LEFT_SHOULDER)
         right_shoulder = get_keypoint(landmarks, mp_pose.PoseLandmark.RIGHT_SHOULDER)
     except:
-        print("No landmark") # 어깨 감지 안되면 사람이 아닌 물체로 판단
-        return "No landmark"
+        print("No Landmarks") # 어깨 감지 안되면 사람이 아닌 물체로 판단
+        return "No Landmarks"
     try:
         left_hip = get_keypoint(landmarks, mp_pose.PoseLandmark.LEFT_HIP)
         right_hip = get_keypoint(landmarks, mp_pose.PoseLandmark.RIGHT_HIP)
@@ -191,7 +191,8 @@ def track_people_from_video(video_path, output_set):
             print(f"Number of people: {len(current_frame_people)}")
             for j, center in enumerate(centers):
                 print(f"Person {j + 1} center: {center}")
-            print(frame_count)
+            
+            print(frame_count) # frame_interval 및 객체 탐지 발생 시각 확인
 
             if frame_count == 0:
                 tracked_people = [[(coord, 1)] for coord in current_frame_people]
