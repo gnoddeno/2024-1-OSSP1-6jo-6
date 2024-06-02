@@ -64,20 +64,28 @@ def detect_people(image):
 
 def classify_pose(landmarks):
     """ keypoints 정보를 기반으로 자세를 분류 """
-    left_shoulder = get_keypoint(landmarks, mp_pose.PoseLandmark.LEFT_SHOULDER)
-    right_shoulder = get_keypoint(landmarks, mp_pose.PoseLandmark.RIGHT_SHOULDER)
-    left_hip = get_keypoint(landmarks, mp_pose.PoseLandmark.LEFT_HIP)
-    right_hip = get_keypoint(landmarks, mp_pose.PoseLandmark.RIGHT_HIP)
-    left_knee = get_keypoint(landmarks, mp_pose.PoseLandmark.LEFT_KNEE)
-    right_knee = get_keypoint(landmarks, mp_pose.PoseLandmark.RIGHT_KNEE)
-    left_eye = get_keypoint(landmarks, mp_pose.PoseLandmark.LEFT_EYE)
-    right_eye = get_keypoint(landmarks, mp_pose.PoseLandmark.RIGHT_EYE)
-    left_ear = get_keypoint(landmarks, mp_pose.PoseLandmark.LEFT_EAR)
-    right_ear = get_keypoint(landmarks, mp_pose.PoseLandmark.RIGHT_EAR)
-    #left_ankle = get_keypoint(landmarks, mp_pose.PoseLandmark.LEFT_ANKLE)
-    #right_ankle = get_keypoint(landmarks, mp_pose.PoseLandmark.RIGHT_ANKLE)
+    try:
+        left_shoulder = get_keypoint(landmarks, mp_pose.PoseLandmark.LEFT_SHOULDER)
+        right_shoulder = get_keypoint(landmarks, mp_pose.PoseLandmark.RIGHT_SHOULDER)
+    except:
+        print("No Landmarks") # 어깨 감지 안되면 사람이 아닌 물체로 판단
+        return "No Landmarks"
+    try:
+        left_hip = get_keypoint(landmarks, mp_pose.PoseLandmark.LEFT_HIP)
+        right_hip = get_keypoint(landmarks, mp_pose.PoseLandmark.RIGHT_HIP)
+        left_knee = get_keypoint(landmarks, mp_pose.PoseLandmark.LEFT_KNEE)
+        right_knee = get_keypoint(landmarks, mp_pose.PoseLandmark.RIGHT_KNEE)
+        left_eye = get_keypoint(landmarks, mp_pose.PoseLandmark.LEFT_EYE)
+        right_eye = get_keypoint(landmarks, mp_pose.PoseLandmark.RIGHT_EYE)
+        left_ear = get_keypoint(landmarks, mp_pose.PoseLandmark.LEFT_EAR)
+        right_ear = get_keypoint(landmarks, mp_pose.PoseLandmark.RIGHT_EAR)
+        #left_ankle = get_keypoint(landmarks, mp_pose.PoseLandmark.LEFT_ANKLE)
+        #right_ankle = get_keypoint(landmarks, mp_pose.PoseLandmark.RIGHT_ANKLE)
+    except:
+        print('Detected Only Shoulder') # 어깨 감지시 사람이라 판단
+        return "Not Standing"
     
-
+    
     if (left_shoulder[2] > 0.5 and right_shoulder[2] > 0.5 and
         left_hip[2] > 0.5 and right_hip[2] > 0.5 and
         (left_knee[2] > 0.5 or right_knee[2] > 0.5)):
@@ -174,14 +182,18 @@ def track_people_from_video(video_path, output_set):
         ret, frame = cap.read()
         if not ret:
             break
-
+                
         if frame_count % frame_interval == 0:
+            #cv2.waitKey(int(1000/frame_interval)) # 동영상 속도보다 빠른 검출 방지
             current_frame_people = detect_people(frame)
+            
+            print(frame_count, 'frame') # frame_interval 및 객체 탐지 발생 시각 확인
 
             centers = [calculate_center(coord) for coord in current_frame_people]
             print(f"Number of people: {len(current_frame_people)}")
             for j, center in enumerate(centers):
                 print(f"Person {j + 1} center: {center}")
+            
 
             if frame_count == 0:
                 tracked_people = [[(coord, 1)] for coord in current_frame_people]
@@ -205,7 +217,7 @@ def track_people_from_video(video_path, output_set):
                         pose_classification = get_landmark(person_image)
                         if pose_classification == "Not Standing":
                             alert_message = "Detected stationary person!"
-                            print("="*20,"\n",alert_message,"\n","="*20)
+                            print("="*27 + "\n" + alert_message + "\n" + "="*27)
                             return alert_message
                     except Exception as e:
                         print(e)
