@@ -186,13 +186,14 @@ def track_people_from_video(video_path, output_set):
         if frame_count % frame_interval == 0:
             #cv2.waitKey(int(1000/frame_interval)) # 동영상 속도보다 빠른 검출 방지
             current_frame_people = detect_people(frame)
+            
+            print(frame_count, 'frame') # frame_interval 및 객체 탐지 발생 시각 확인
 
             centers = [calculate_center(coord) for coord in current_frame_people]
             print(f"Number of people: {len(current_frame_people)}")
             for j, center in enumerate(centers):
                 print(f"Person {j + 1} center: {center}")
             
-            print(frame_count) # frame_interval 및 객체 탐지 발생 시각 확인
 
             if frame_count == 0:
                 tracked_people = [[(coord, 1)] for coord in current_frame_people]
