@@ -3,7 +3,7 @@ import Navbar from './Navbar'
 import { useRef } from 'react'
 import { useState, useEffect } from 'react'
 import Cookies from 'js-cookie'
-
+django.urls = 'http://localhost:8000/upload_video/'
 function App() {
   const [alarm, setAlarm] = useState([{id: 1, camera: 1, message: '기존 알림 메시지'}, {id: 2, camera: 2, message: '기존 알림 메시지'}]);
   const videoRef = useRef(null);
@@ -38,7 +38,7 @@ function App() {
     console.log(data[0].ip , data[0].port)
     const data1= {"ip": data[0].ip, "port": data[0].port}
     try {
-      const response = await fetch('http://localhost:8000/upload_video/',{ 
+      const response = await fetch( django.urls,{ 
       method : 'POST',
       headers : {
         'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ function App() {
     formData.append('video', file);
 
     try {
-      const response = await fetch('http://localhost:8000/upload_video/', {  // Django 서버의 URL
+      const response = await fetch(django.urls, {  // Django 서버의 URL
         method: 'POST',
         body: formData,
       });
@@ -134,6 +134,9 @@ function App() {
           </ul>
           <div>
             <h3>Load Video File</h3>
+                        <video ref={videoRef} controls autoPlay>
+              <source src='' type='video/mp4' />
+            </video>
             <input
               type='file'
               ref={fileInputRef}
